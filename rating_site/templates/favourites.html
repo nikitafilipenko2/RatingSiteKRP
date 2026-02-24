@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Избранные игры{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 20px; color: #2c3e50;">Мои избранные игры</h1>
+
+{% if favourites %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+        {% for favourite in favourites %}
+            <div class="game-card" style="position: relative;">
+                <div style="position: absolute; top: 10px; right: 10px; color: #e74c3c; font-size: 0.9rem;">
+                    Добавлено: {{ favourite.dt_created|date:"d.m.Y" }}
+                </div>
+                
+                <div class="game-title">{{ favourite.game.name }}</div>
+                
+                <div class="game-info" style="margin-top: 15px;">
+                    <div class="game-info-item">
+                        <span class="game-info-label">Разработчик:</span>
+                        {{ favourite.game.developer }}
+                    </div>
+                    <div class="game-info-item">
+                        <span class="game-info-label">Жанр:</span>
+                        {{ favourite.game.genre }}
+                    </div>
+                    <div class="game-info-item">
+                        <span class="game-info-label">Год:</span>
+                        {{ favourite.game.year|date:"Y" }}
+                    </div>
+                </div>
+                
+                <div class="game-rating">
+                    <div class="rating-stars">
+                        {% with avg_rating=favourite.game.reviews.all %}
+                            {% if avg_rating %}
+                                {% with avg=avg_rating|dictsort:"score"|last %}
+                                    Рейтинг: {{ avg.score }}/10
+                                {% endwith %}
+                            {% else %}
+                                Нет оценок
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    
+                    <div>
+                        <a href="{% url 'game_detail' favourite.game.id %}" class="btn">Подробнее</a>
+                        <a href="{% url 'remove_from_favourite' favourite.game.id %}" 
+                           class="btn" 
+                           style="background-color: #95a5a6;"
+                           onclick="return confirm('Удалить из избранного?')">
+                            Удалить
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="background: white; padding: 40px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <p style="color: #666; font-size: 1.1rem; margin-bottom: 20px;">
+            У вас пока нет избранных игр
+        </p>
+        <a href="{% url 'home' %}" class="btn" style="padding: 12px 30px;">Перейти к каталогу</a>
+    </div>
+{% endif %}
+{% endblock %}

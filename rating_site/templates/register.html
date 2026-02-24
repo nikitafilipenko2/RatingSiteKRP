@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto;">
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Регистрация</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+                    Пожалуйста, исправьте ошибки ниже:
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+            
+            <div style="margin-bottom: 20px;">
+                <label for="id_username" style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold;">
+                    Имя пользователя
+                </label>
+                <input type="text" name="username" id="id_username" required
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Не более 150 символов. Только буквы, цифры и @/./+/-/_.
+                </small>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="id_password1" style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold;">
+                    Пароль
+                </label>
+                <input type="password" name="password1" id="id_password1" required
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Пароль должен содержать минимум 8 символов и не быть слишком простым.
+                </small>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="id_password2" style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold;">
+                    Подтверждение пароля
+                </label>
+                <input type="password" name="password2" id="id_password2" required
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Введите тот же пароль ещё раз для проверки.
+                </small>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 16px;">
+                Зарегистрироваться
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="color: #666;">
+                Уже есть аккаунт? 
+                <a href="{% url 'login' %}" style="color: #3498db; text-decoration: none;">Войти</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
