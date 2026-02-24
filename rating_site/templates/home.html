@@ -1,12 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{% for game in games_list %}
-    <p> {{ game.name }} </p>
-{% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1 style="margin-bottom: 20px; color: #2c3e50;">{{ title }}</h1>
+    
+    {% if games %}
+        {% for game in games %}
+            <div class="game-card">
+                <div class="game-title">{{ game.name }}</div>
+                <div class="game-info">
+                    <div class="game-info-item">
+                        <span class="game-info-label">Разработчик:</span>
+                        {{ game.developer }}
+                    </div>
+                    <div class="game-info-item">
+                        <span class="game-info-label">Издатель:</span>
+                        {{ game.producer }}
+                    </div>
+                    <div class="game-info-item">
+                        <span class="game-info-label">Жанр:</span>
+                        {{ game.genre }}
+                    </div>
+                    <div class="game-info-item">
+                        <span class="game-info-label">Год:</span>
+                        {{ game.year|date:"Y" }}
+                    </div>
+                    <div class="game-info-item">
+                        <span class="game-info-label">ОС:</span>
+                        {{ game.operating_system }}
+                    </div>
+                </div>
+                
+                <div class="game-rating">
+                    <div class="rating-stars">
+                        {% with avg_rating=game.reviews.all %}
+                            {% if avg_rating %}
+                                {% with avg=avg_rating|dictsort:"score"|last %}
+                                    Средний рейтинг: {{ avg.score }}/10
+                                {% endwith %}
+                            {% else %}
+                                Нет оценок
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    
+                    <div>
+                        <a href="{% url 'game_detail' game.id %}" class="btn">Подробнее</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'add_to_favourite' game.id %}" class="btn btn-favourite">В избранное</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Пагинация -->
+        {% if games.has_other_pages %}
+            <ul class="pagination">
+                {% if games.has_previous %}
+                    <li><a href="?page=1">&laquo; Первая</a></li>
+                    <li><a href="?page={{ games.previous_page_number }}">Предыдущая</a></li>
+                {% else %}
+                    <li class="disabled"><span>&laquo; Первая</span></li>
+                    <li class="disabled"><span>Предыдущая</span></li>
+                {% endif %}
+
+                {% for num in games.paginator.page_range %}
+                    {% if games.number == num %}
+                        <li class="active"><span>{{ num }}</span></li>
+                    {% elif num > games.number|add:'-3' and num < games.number|add:'3' %}
+                        <li><a href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if games.has_next %}
+                    <li><a href="?page={{ games.next_page_number }}">Следующая</a></li>
+                    <li><a href="?page={{ games.paginator.num_pages }}">Последняя &raquo;</a></li>
+                {% else %}
+                    <li class="disabled"><span>Следующая</span></li>
+                    <li class="disabled"><span>Последняя &raquo;</span></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    {% else %}
+        <p>Игры пока не добавлены</p>
+    {% endif %}
+{% endblock %}
