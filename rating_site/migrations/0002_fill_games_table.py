@@ -22,11 +22,9 @@ def parse_release_date(value: str) -> date:
 
     value = value.strip()
 
-    # Только год
     if value.isdigit() and len(value) == 4:
         return date(int(value), 1, 1)
 
-    # Полная дата в формате "Month DD, YYYY"
     for fmt in ("%B %d, %Y", "%b %d, %Y"):
         try:
             return datetime.strptime(value, fmt).date()
@@ -68,13 +66,12 @@ def load_games(apps, schema_editor):
                 )
             )
 
-    # ignore_conflicts=True не даст упасть, если запись с таким name уже есть
     Game.objects.bulk_create(games_to_create, ignore_conflicts=True, batch_size=500)
 
 
 def unload_games(apps, schema_editor):
     Game = apps.get_model("rating_site", "Game")
-    # Осторожный rollback: удаляем только записи, которые совпадают с CSV
+
     csv_path = Path(settings.BASE_DIR) / "computer_games.csv"
 
     if not csv_path.exists():
