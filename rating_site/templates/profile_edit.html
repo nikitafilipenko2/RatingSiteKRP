@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Редактирование профиля{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
+            <h1 class="text-2xl font-bold text-white">Редактирование профиля</h1>
+            <p class="text-blue-100">Заполните информацию о себе</p>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data" class="p-6">
+            {% csrf_token %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 {% if message.tags == 'error' %}bg-red-50 text-red-800 border-red-200{% else %}bg-green-50 text-green-800 border-green-200{% endif %} border rounded-lg">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Аватар -->
+                <div class="md:col-span-1">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Текущий аватар</label>
+                        <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white shadow-md mb-4">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full bg-gray-300 flex items-center justify-center text-4xl font-bold text-gray-600">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ profile_form.avatar.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Загрузить новый аватар
+                            </label>
+                            <input type="file" name="avatar" accept="image/*" id="{{ profile_form.avatar.id_for_label }}"
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            {% if profile_form.avatar.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.avatar.errors.0 }}</p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500">Рекомендуемый размер: 300x300px. Максимум 5MB.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Основная информация -->
+                <div class="md:col-span-2 space-y-6">
+                    <!-- Основные данные пользователя -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Основная информация</h2>
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label for="{{ user_form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ user_form.username.label }} *
+                                </label>
+                                {{ user_form.username }}
+                                {% if user_form.username.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ user_form.username.errors.0 }}</p>
+                                {% endif %}
+                                {% if user_form.username.help_text %}
+                                    <p class="mt-1 text-xs text-gray-500">{{ user_form.username.help_text }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ user_form.email.label }}
+                                </label>
+                                {{ user_form.email }}
+                                {% if user_form.email.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ user_form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="{{ user_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ user_form.first_name.label }}
+                                    </label>
+                                    {{ user_form.first_name }}
+                                </div>
+                                <div>
+                                    <label for="{{ user_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ user_form.last_name.label }}
+                                    </label>
+                                    {{ user_form.last_name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Дополнительная информация профиля -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Дополнительная информация</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="{{ profile_form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ profile_form.bio.label }}
+                                </label>
+                                {{ profile_form.bio }}
+                                {% if profile_form.bio.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ profile_form.bio.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ profile_form.birth_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ profile_form.birth_date.label }}
+                                </label>
+                                {{ profile_form.birth_date }}
+                                {% if profile_form.birth_date.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ profile_form.birth_date.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ profile_form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ profile_form.location.label }}
+                                </label>
+                                {{ profile_form.location }}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ profile_form.website.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    {{ profile_form.website.label }}
+                                </label>
+                                {{ profile_form.website }}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="{{ profile_form.telegram.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ profile_form.telegram.label }}
+                                    </label>
+                                    {{ profile_form.telegram }}
+                                </div>
+                                <div>
+                                    <label for="{{ profile_form.discord.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ profile_form.discord.label }}
+                                    </label>
+                                    {{ profile_form.discord }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
+                <a href="{% url 'profile' user.username %}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Отмена
+                </a>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Сохранить изменения
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

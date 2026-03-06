@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Редактирование отзыва{% else %}Добавление отзыва{% endif %} - {{ game.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <!-- Заголовок -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
+            <h1 class="text-2xl font-bold text-white">
+                {% if is_edit %}
+                    Редактирование отзыва
+                {% else %}
+                    Добавление отзыва
+                {% endif %}
+            </h1>
+            <p class="text-blue-100">Игра: {{ game.name }}</p>
+        </div>
+        
+        <!-- Форма -->
+        <form method="post" class="p-6">
+            {% csrf_token %}
+            
+            <!-- Оценка -->
+            <div class="mb-6">
+                <label for="{{ form.score.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.score.label }} *
+                </label>
+                <div class="flex items-center space-x-2">
+                    {{ form.score }}
+                    <span class="text-sm text-gray-500">из 10</span>
+                </div>
+                {% if form.score.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.score.errors.0 }}</p>
+                {% endif %}
+                {% if form.score.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.score.help_text }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Комментарий -->
+            <div class="mb-6">
+                <label for="{{ form.comment.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.comment.label }}
+                </label>
+                {{ form.comment }}
+                {% if form.comment.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.comment.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-xs text-gray-500">Расскажите, что вам понравилось или не понравилось в игре</p>
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'game_detail' game.id %}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Отмена
+                </a>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    {% if is_edit %}
+                        Сохранить изменения
+                    {% else %}
+                        Опубликовать отзыв
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Подсказки по оценкам -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="text-sm font-semibold text-blue-800 mb-2">Как ставить оценки?</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+            <div class="text-center p-2 bg-white rounded border border-blue-100">
+                <span class="font-bold text-red-600">0-3</span><br>
+                <span class="text-gray-600">Очень плохо</span>
+            </div>
+            <div class="text-center p-2 bg-white rounded border border-blue-100">
+                <span class="font-bold text-orange-600">4-5</span><br>
+                <span class="text-gray-600">Плохо</span>
+            </div>
+            <div class="text-center p-2 bg-white rounded border border-blue-100">
+                <span class="font-bold text-yellow-600">6-7</span><br>
+                <span class="text-gray-600">Нормально</span>
+            </div>
+            <div class="text-center p-2 bg-white rounded border border-blue-100">
+                <span class="font-bold text-green-600">8-9</span><br>
+                <span class="text-gray-600">Хорошо</span>
+            </div>
+            <div class="text-center p-2 bg-white rounded border border-blue-100">
+                <span class="font-bold text-purple-600">10</span><br>
+                <span class="text-gray-600">Шедевр</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
