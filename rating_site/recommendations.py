@@ -12,6 +12,7 @@ class GameRecommender:
     4. Сортируем по релевантности
     """
 
+
     def __init__(self, user):
         self.user = user
         self.favourite_games = FavouriteGame.objects.filter(user=user).select_related('game')
