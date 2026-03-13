@@ -221,11 +221,6 @@
                 <a href="{% url 'games_list' %}">Игры</a>
                 {% if user.is_authenticated %}
                     <span class="user-info">{{ user.username }}</span>
-                    <a href="{% url 'favourites' %}">Избранное</a>
-                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-logout">Выйти</button>
-                    </form>
                 {% else %}
                     <a href="{% url 'login' %}">Войти</a>
                     <a href="{% url 'register' %}">Регистрация</a>
@@ -234,7 +229,6 @@
                 <a href="{% url 'profile' user.username %}" class="text-gray-700 hover:text-blue-600">
                  Мой профиль
                 </a>
-                <span class="user-info">{{ user.username }}</span>
                 <a href="{% url 'favourites' %}">Избранное</a>
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
