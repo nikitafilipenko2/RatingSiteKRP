@@ -1,7 +1,11 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from rating_site.admin import admin_site
 urlpatterns = [
     # Главная
     path('', views.home, name='home'),
@@ -29,4 +33,5 @@ urlpatterns = [
     path('game/<int:game_id>/add-review/', views.add_review, name='add_review'),
     path('review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     path('review/<int:review_id>/edit/', views.edit_review, name='edit_review'),
+    path('admin/', admin_site.urls),
 ]

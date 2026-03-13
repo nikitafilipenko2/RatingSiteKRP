@@ -1,89 +1,173 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <h1 style="margin-bottom: 20px; color: #2c3e50;">{{ title }}</h1>
-    
-    {% if games %}
-        {% for game in games %}
-            <div class="game-card">
-                <div class="game-title">{{ game.name }}</div>
-                <div class="game-info">
-                    <div class="game-info-item">
-                        <span class="game-info-label">Разработчик:</span>
-                        {{ game.developer }}
-                    </div>
-                    <div class="game-info-item">
-                        <span class="game-info-label">Издатель:</span>
-                        {{ game.producer }}
-                    </div>
-                    <div class="game-info-item">
-                        <span class="game-info-label">Жанр:</span>
-                        {{ game.genre }}
-                    </div>
-                    <div class="game-info-item">
-                        <span class="game-info-label">Год:</span>
-                        {{ game.year|date:"Y" }}
-                    </div>
-                    <div class="game-info-item">
-                        <span class="game-info-label">ОС:</span>
-                        {{ game.operating_system }}
-                    </div>
-                </div>
-                
-                <div class="game-rating">
-                    <div class="rating-stars">
-                        {% with avg_rating=game.reviews.all %}
-                            {% if avg_rating %}
-                                {% with avg=avg_rating|dictsort:"score"|last %}
-                                    Средний рейтинг: {{ avg.score }}/10
-                                {% endwith %}
-                            {% else %}
-                                Нет оценок
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                    
-                    <div>
-                        <a href="{% url 'game_detail' game.id %}" class="btn">Подробнее</a>
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'add_to_favourite' game.id %}" class="btn btn-favourite">В избранное</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-
-        <!-- Пагинация -->
-        {% if games.has_other_pages %}
-            <ul class="pagination">
-                {% if games.has_previous %}
-                    <li><a href="?page=1">&laquo; Первая</a></li>
-                    <li><a href="?page={{ games.previous_page_number }}">Предыдущая</a></li>
-                {% else %}
-                    <li class="disabled"><span>&laquo; Первая</span></li>
-                    <li class="disabled"><span>Предыдущая</span></li>
-                {% endif %}
-
-                {% for num in games.paginator.page_range %}
-                    {% if games.number == num %}
-                        <li class="active"><span>{{ num }}</span></li>
-                    {% elif num > games.number|add:'-3' and num < games.number|add:'3' %}
-                        <li><a href="?page={{ num }}">{{ num }}</a></li>
-                    {% endif %}
+<div style="display: flex; flex-direction: column; gap: 40px;">
+    <!-- Рекомендации для авторизованных -->
+    {% if user.is_authenticated and recommendations %}
+        <div>
+            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px;">Рекомендуем для вас</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                {% for game in recommendations %}
+                    <a href="{% url 'game_detail' game.id %}" style="text-decoration: none; background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s; hover: transform: translateY(-2px);">
+                        <h3 style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">{{ game.name }}</h3>
+                        <p style="color: #666; font-size: 14px;">{{ game.genre }}</p>
+                        <div style="margin-top: 10px; display: flex; align-items: center;">
+                            <span style="color: #f1c40f;">★</span>
+                            <span style="margin-left: 5px; color: #333;">{{ game.get_average_rating|floatformat:1 }}</span>
+                        </div>
+                    </a>
                 {% endfor %}
-
-                {% if games.has_next %}
-                    <li><a href="?page={{ games.next_page_number }}">Следующая</a></li>
-                    <li><a href="?page={{ games.paginator.num_pages }}">Последняя &raquo;</a></li>
-                {% else %}
-                    <li class="disabled"><span>Следующая</span></li>
-                    <li class="disabled"><span>Последняя &raquo;</span></li>
-                {% endif %}
-            </ul>
-        {% endif %}
-    {% else %}
-        <p>Игры пока не добавлены</p>
+            </div>
+        </div>
     {% endif %}
+
+    <!-- Популярные игры -->
+    {% if popular_games %}
+        <div>
+            <h2 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px;">Популярные игры</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                {% for game in popular_games %}
+                    <a href="{% url 'game_detail' game.id %}" style="text-decoration: none; background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s;">
+                        <h3 style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">{{ game.name }}</h3>
+                        <p style="color: #666; font-size: 14px;">{{ game.genre }}</p>
+                        <div style="margin-top: 10px; display: flex; align-items: center;">
+                            <span style="color: #f1c40f;">★</span>
+                            <span style="margin-left: 5px; color: #333;">{{ game.get_average_rating|floatformat:1 }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Основная часть с фильтрами и списком игр -->
+    <div style="display: flex; gap: 30px;">
+        <!-- Боковая панель с фильтрами -->
+        <div style="width: 280px; flex-shrink: 0;">
+            <div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 20px;">
+                <h2 style="color: #2c3e50; font-size: 18px; margin-bottom: 20px;">Фильтры</h2>
+
+                <form method="get" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Поиск -->
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold; font-size: 14px;">Поиск</label>
+                        <input type="text" name="search" value="{{ current_search }}"
+                               style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                               placeholder="Название, разработчик...">
+                    </div>
+
+                    <!-- Жанр -->
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold; font-size: 14px;">Жанр</label>
+                        <select name="genre" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">Все жанры</option>
+                            {% for genre in all_genres %}
+                                <option value="{{ genre }}" {% if current_genre == genre %}selected{% endif %}>
+                                    {{ genre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Разработчик -->
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold; font-size: 14px;">Разработчик</label>
+                        <select name="developer" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">Все разработчики</option>
+                            {% for dev in all_developers %}
+                                <option value="{{ dev }}" {% if current_developer == dev %}selected{% endif %}>
+                                    {{ dev }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Сортировка -->
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold; font-size: 14px;">Сортировка</label>
+                        <select name="sort" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="name" {% if current_sort == 'name' %}selected{% endif %}>По названию</option>
+                            <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>По рейтингу</option>
+                            <option value="favourites" {% if current_sort == 'favourites' %}selected{% endif %}>По популярности</option>
+                            <option value="reviews" {% if current_sort == 'reviews' %}selected{% endif %}>По отзывам</option>
+                            <option value="year_desc" {% if current_sort == 'year_desc' %}selected{% endif %}>Новые сначала</option>
+                            <option value="year_asc" {% if current_sort == 'year_asc' %}selected{% endif %}>Старые сначала</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%;">
+                        Применить
+                    </button>
+
+                    <a href="{% url 'home' %}" style="display: block; text-align: center; color: #666; font-size: 14px; text-decoration: none;">
+                        Сбросить фильтры
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Список игр -->
+        <div style="flex: 1;">
+            <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 20px;">Все игры ({{ games.paginator.count }})</h2>
+
+            {% if games %}
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    {% for game in games %}
+                        <div class="game-card" style="margin-bottom: 0;">
+                            <div class="game-title">{{ game.name }}</div>
+                            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                                <span style="background: #e1f5fe; color: #0288d1; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ game.genre }}</span>
+                                <span style="background: #f5f5f5; color: #666; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ game.year|date:"Y" }}</span>
+                            </div>
+
+                            <div style="margin-bottom: 10px; color: #666; font-size: 14px;">
+                                <div>👤 {{ game.developer }}</div>
+                                <div>🏢 {{ game.producer }}</div>
+                            </div>
+
+                            <div class="game-rating">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="rating-stars">★</span>
+                                    <span style="font-weight: bold;">{{ game.get_average_rating|floatformat:1 }}</span>
+                                    <span style="color: #999; font-size: 12px;">({{ game.reviews.count }})</span>
+                                    <span style="color: #e74c3c; margin-left: 10px;">❤️ {{ game.get_favourites_count }}</span>
+                                </div>
+
+                                <a href="{% url 'game_detail' game.id %}" class="btn">Подробнее</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Пагинация -->
+                {% if games.has_other_pages %}
+                    <ul class="pagination">
+                        {% if games.has_previous %}
+                            <li><a href="?page=1{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_developer %}&developer={{ current_developer }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}">Первая</a></li>
+                            <li><a href="?page={{ games.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_developer %}&developer={{ current_developer }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}">←</a></li>
+                        {% endif %}
+
+                        {% for num in games.paginator.page_range %}
+                            {% if games.number == num %}
+                                <li class="active"><span>{{ num }}</span></li>
+                            {% elif num > games.number|add:'-3' and num < games.number|add:'3' %}
+                                <li><a href="?page={{ num }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_developer %}&developer={{ current_developer }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if games.has_next %}
+                            <li><a href="?page={{ games.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_developer %}&developer={{ current_developer }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}">→</a></li>
+                            <li><a href="?page={{ games.paginator.num_pages }}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_developer %}&developer={{ current_developer }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}">Последняя</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            {% else %}
+                <p style="text-align: center; color: #666; padding: 40px;">Игры не найдены</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

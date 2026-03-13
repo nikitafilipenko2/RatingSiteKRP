@@ -1,0 +1,116 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Статистика сайта{% endblock %}
+
+{% block content %}
+<div style="padding: 20px;">
+    <h1 style="font-size: 24px; margin-bottom: 20px;">Статистика GameRating</h1>
+    
+    <!-- Общая статистика -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 14px; opacity: 0.9;">Игры</div>
+            <div style="font-size: 36px; font-weight: bold;">{{ total_games }}</div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 14px; opacity: 0.9;">Пользователи</div>
+            <div style="font-size: 36px; font-weight: bold;">{{ total_users }}</div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 14px; opacity: 0.9;">Отзывы</div>
+            <div style="font-size: 36px; font-weight: bold;">{{ total_reviews }}</div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 14px; opacity: 0.9;">В избранном</div>
+            <div style="font-size: 36px; font-weight: bold;">{{ total_favourites }}</div>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Топ игр по отзывам -->
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 18px; margin-bottom: 15px;">Топ игр по количеству отзывов</h2>
+            <table style="width: 100%;">
+                {% for game in top_reviewed_games %}
+                <tr>
+                    <td style="padding: 8px 0;">{{ forloop.counter }}. {{ game.name }}</td>
+                    <td style="padding: 8px 0; text-align: right;"><b>{{ game.review_count }}</b> отзывов</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <!-- Топ игр по рейтингу -->
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 18px; margin-bottom: 15px;">Топ игр по рейтингу</h2>
+            <table style="width: 100%;">
+                {% for game, rating in top_rated_games %}
+                <tr>
+                    <td style="padding: 8px 0;">{{ forloop.counter }}. {{ game.name }}</td>
+                    <td style="padding: 8px 0; text-align: right;">
+                        <b>{{ rating|floatformat:1 }}</b> ⭐
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <!-- Топ игр по избранному -->
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 18px; margin-bottom: 15px;">Самые популярные игры</h2>
+            <table style="width: 100%;">
+                {% for game in top_favourite_games %}
+                <tr>
+                    <td style="padding: 8px 0;">{{ forloop.counter }}. {{ game.name }}</td>
+                    <td style="padding: 8px 0; text-align: right;"><b>{{ game.fav_count }}</b> ❤️</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <!-- Статистика по жанрам -->
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 18px; margin-bottom: 15px;">Статистика по жанрам</h2>
+            <table style="width: 100%;">
+                {% for genre in genre_stats %}
+                <tr>
+                    <td style="padding: 8px 0;">{{ forloop.counter }}. {{ genre.genre }}</td>
+                    <td style="padding: 8px 0; text-align: right;">
+                        <b>{{ genre.count }}</b> игр
+                        {% if genre.avg_rating %}
+                        , рейтинг {{ genre.avg_rating|floatformat:1 }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <!-- Активные пользователи -->
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); grid-column: span 2;">
+            <h2 style="font-size: 18px; margin-bottom: 15px;">Самые активные пользователи</h2>
+            <table style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 8px 0;">Пользователь</th>
+                        <th style="text-align: right; padding: 8px 0;">Отзывы</th>
+                        <th style="text-align: right; padding: 8px 0;">В избранном</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in top_users %}
+                    <tr>
+                        <td style="padding: 8px 0;">{{ user.username }}</td>
+                        <td style="padding: 8px 0; text-align: right;">{{ user.review_count }}</td>
+                        <td style="padding: 8px 0; text-align: right;">{{ user.favourite_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

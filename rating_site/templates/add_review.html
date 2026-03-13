@@ -3,59 +3,56 @@
 {% block title %}{% if is_edit %}Редактирование отзыва{% else %}Добавление отзыва{% endif %} - {{ game.name }}{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
         <!-- Заголовок -->
-        <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
-            <h1 class="text-2xl font-bold text-white">
+        <div style="background: linear-gradient(135deg, #3498db, #9b59b6); padding: 30px;">
+            <h1 style="color: white; font-size: 24px; margin: 0 0 5px;">
                 {% if is_edit %}
                     Редактирование отзыва
                 {% else %}
                     Добавление отзыва
                 {% endif %}
             </h1>
-            <p class="text-blue-100">Игра: {{ game.name }}</p>
+            <p style="color: rgba(255,255,255,0.9); margin: 0;">Игра: {{ game.name }}</p>
         </div>
-        
+
         <!-- Форма -->
-        <form method="post" class="p-6">
+        <form method="post" style="padding: 30px;">
             {% csrf_token %}
-            
+
             <!-- Оценка -->
-            <div class="mb-6">
-                <label for="{{ form.score.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.score.id_for_label }}" style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold;">
                     {{ form.score.label }} *
                 </label>
-                <div class="flex items-center space-x-2">
+                <div style="display: flex; align-items: center; gap: 10px;">
                     {{ form.score }}
-                    <span class="text-sm text-gray-500">из 10</span>
+                    <span style="color: #666;">из 10</span>
                 </div>
                 {% if form.score.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.score.errors.0 }}</p>
-                {% endif %}
-                {% if form.score.help_text %}
-                    <p class="mt-1 text-xs text-gray-500">{{ form.score.help_text }}</p>
+                    <p style="color: #e74c3c; font-size: 14px; margin-top: 5px;">{{ form.score.errors.0 }}</p>
                 {% endif %}
             </div>
-            
+
             <!-- Комментарий -->
-            <div class="mb-6">
-                <label for="{{ form.comment.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.comment.id_for_label }}" style="display: block; margin-bottom: 5px; color: #34495e; font-weight: bold;">
                     {{ form.comment.label }}
                 </label>
                 {{ form.comment }}
                 {% if form.comment.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.comment.errors.0 }}</p>
+                    <p style="color: #e74c3c; font-size: 14px; margin-top: 5px;">{{ form.comment.errors.0 }}</p>
                 {% endif %}
-                <p class="mt-1 text-xs text-gray-500">Расскажите, что вам понравилось или не понравилось в игре</p>
+                <p style="color: #999; font-size: 12px; margin-top: 5px;">Расскажите, что вам понравилось или не понравилось в игре</p>
             </div>
-            
+
             <!-- Кнопки -->
-            <div class="flex justify-end space-x-4">
-                <a href="{% url 'game_detail' game.id %}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                <a href="{% url 'game_detail' game.id %}" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; color: #666; text-decoration: none;">
                     Отмена
                 </a>
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button type="submit" class="btn">
                     {% if is_edit %}
                         Сохранить изменения
                     {% else %}
@@ -65,30 +62,30 @@
             </div>
         </form>
     </div>
-    
+
     <!-- Подсказки по оценкам -->
-    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 class="text-sm font-semibold text-blue-800 mb-2">Как ставить оценки?</h3>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-            <div class="text-center p-2 bg-white rounded border border-blue-100">
-                <span class="font-bold text-red-600">0-3</span><br>
-                <span class="text-gray-600">Очень плохо</span>
+    <div style="margin-top: 30px; background: #e1f5fe; border: 1px solid #4fc3f7; border-radius: 8px; padding: 20px;">
+        <h3 style="color: #0288d1; font-size: 16px; margin-bottom: 10px;">Как ставить оценки?</h3>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center; font-size: 12px;">
+            <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #4fc3f7;">
+                <span style="font-weight: bold; color: #e74c3c;">0-3</span><br>
+                <span style="color: #666;">Очень плохо</span>
             </div>
-            <div class="text-center p-2 bg-white rounded border border-blue-100">
-                <span class="font-bold text-orange-600">4-5</span><br>
-                <span class="text-gray-600">Плохо</span>
+            <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #4fc3f7;">
+                <span style="font-weight: bold; color: #e67e22;">4-5</span><br>
+                <span style="color: #666;">Плохо</span>
             </div>
-            <div class="text-center p-2 bg-white rounded border border-blue-100">
-                <span class="font-bold text-yellow-600">6-7</span><br>
-                <span class="text-gray-600">Нормально</span>
+            <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #4fc3f7;">
+                <span style="font-weight: bold; color: #f1c40f;">6-7</span><br>
+                <span style="color: #666;">Нормально</span>
             </div>
-            <div class="text-center p-2 bg-white rounded border border-blue-100">
-                <span class="font-bold text-green-600">8-9</span><br>
-                <span class="text-gray-600">Хорошо</span>
+            <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #4fc3f7;">
+                <span style="font-weight: bold; color: #27ae60;">8-9</span><br>
+                <span style="color: #666;">Хорошо</span>
             </div>
-            <div class="text-center p-2 bg-white rounded border border-blue-100">
-                <span class="font-bold text-purple-600">10</span><br>
-                <span class="text-gray-600">Шедевр</span>
+            <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #4fc3f7;">
+                <span style="font-weight: bold; color: #9b59b6;">10</span><br>
+                <span style="color: #666;">Шедевр</span>
             </div>
         </div>
     </div>

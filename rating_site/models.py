@@ -19,6 +19,24 @@ class Game(models.Model):
     def __str__(self):
         return self.name
 
+    def get_average_rating(self):
+        """Получить среднюю оценку игры"""
+        reviews = self.reviews.all()
+        if not reviews:
+            return 0
+        return sum(r.score for r in reviews) / len(reviews)
+
+    def get_rating_distribution(self):
+        """Получить распределение оценок"""
+        distribution = {i: 0 for i in range(11)}  # 0-10
+        for review in self.reviews.all():
+            distribution[review.score] += 1
+        return distribution
+
+    def get_favourites_count(self):
+        """Количество добавлений в избранное"""
+        return self.favourite_games.count()
+
 
 class Review(models.Model):
     score = models.IntegerField(

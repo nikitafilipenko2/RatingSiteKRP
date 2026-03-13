@@ -4,28 +4,28 @@
 {% block title %}{{ profile_user.username }} - Профиль{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="profile-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <!-- Шапка профиля -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-        <div class="h-32 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-        
-        <div class="px-6 pb-6">
-            <div class="flex flex-col sm:flex-row items-center sm:items-end -mt-12 mb-4">
+    <div class="profile-header" style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 24px; overflow: hidden;">
+        <div class="profile-cover" style="height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+
+        <div class="profile-info" style="padding: 20px; position: relative;">
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; margin-top: -50px; margin-bottom: 20px;">
                 <!-- Аватар -->
-                <div class="w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
+                <div style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; overflow: hidden; background: #f0f0f0; margin-right: 20px;">
                     {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" class="w-full h-full object-cover">
+                        <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
                     {% else %}
-                        <div class="w-full h-full bg-gray-300 flex items-center justify-center text-3xl font-bold text-gray-600">
+                        <div style="width: 100%; height: 100%; background: #3498db; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; color: white;">
                             {{ profile_user.username|first|upper }}
                         </div>
                     {% endif %}
                 </div>
-                
-                <!-- Имя пользователя и кнопка редактирования -->
-                <div class="flex-1 mt-4 sm:mt-0 sm:ml-6 text-center sm:text-left">
-                    <h1 class="text-3xl font-bold text-gray-900">{{ profile_user.username }}</h1>
-                    <p class="text-gray-600">
+
+                <!-- Имя пользователя -->
+                <div style="flex: 1;">
+                    <h1 style="font-size: 28px; font-weight: bold; color: #333; margin: 0;">{{ profile_user.username }}</h1>
+                    <p style="color: #666; margin: 5px 0 0;">
                         {% if profile_user.first_name or profile_user.last_name %}
                             {{ profile_user.first_name }} {{ profile_user.last_name }}
                         {% else %}
@@ -33,191 +33,172 @@
                         {% endif %}
                     </p>
                 </div>
-                
-                <!-- Кнопка редактирования (только для своего профиля) -->
+
+                <!-- Кнопка редактирования -->
                 {% if user == profile_user %}
-                    <div class="mt-4 sm:mt-0">
-                        <a href="{% url 'profile_edit' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            Редактировать
+                    <div>
+                        <a href="{% url 'profile_edit' %}" style="display: inline-block; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; transition: background 0.3s;">
+                            ✎ Редактировать профиль
                         </a>
                     </div>
                 {% endif %}
             </div>
-            
+
             <!-- Статистика -->
-            <div class="grid grid-cols-3 gap-4 text-center border-t border-gray-200 pt-4">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
                 <div>
-                    <div class="text-2xl font-bold text-gray-900">{{ reviews_count }}</div>
-                    <div class="text-sm text-gray-600">Отзывов</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #333;">{{ reviews_count }}</div>
+                    <div style="color: #666; font-size: 14px;">Отзывов</div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold text-gray-900">{{ favourites_count }}</div>
-                    <div class="text-sm text-gray-600">В избранном</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #333;">{{ favourites_count }}</div>
+                    <div style="color: #666; font-size: 14px;">В избранном</div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold text-gray-900">{{ profile.games_rated }}</div>
-                    <div class="text-sm text-gray-600">Оценено игр</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #333;">{{ profile.games_rated }}</div>
+                    <div style="color: #666; font-size: 14px;">Оценено игр</div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Информация о пользователе -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Левая колонка: О себе и контакты -->
-        <div class="space-y-6">
+
+    <!-- Основной контент -->
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+        <!-- Левая колонка -->
+        <div>
             <!-- О себе -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">О себе</h2>
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 24px;">
+                <h2 style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px;">О себе</h2>
                 {% if profile.bio %}
-                    <p class="text-gray-700">{{ profile.bio }}</p>
+                    <p style="color: #666; line-height: 1.6;">{{ profile.bio }}</p>
                 {% else %}
-                    <p class="text-gray-500 italic">Пользователь еще не заполнил информацию о себе</p>
+                    <p style="color: #999; font-style: italic;">Пользователь еще не заполнил информацию о себе</p>
                 {% endif %}
             </div>
-            
+
             <!-- Контакты -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Контакты</h2>
-                <div class="space-y-3">
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 24px;">
+                <h2 style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px;">Контакты</h2>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
                     {% if profile.location %}
-                        <div class="flex items-center text-gray-700">
-
-                            {{ profile.location }}
+                        <div style="display: flex; align-items: center; gap: 10px; color: #666;">
+                            <span style="font-size: 18px;">📍</span>
+                            <span>{{ profile.location }}</span>
                         </div>
                     {% endif %}
-                    
+
                     {% if profile.website %}
-                        <div class="flex items-center text-gray-700">
-
-                            <a href="{{ profile.website }}" target="_blank" class="text-blue-600 hover:underline">{{ profile.website }}</a>
+                        <div style="display: flex; align-items: center; gap: 10px; color: #666;">
+                            <span style="font-size: 18px;">🌐</span>
+                            <a href="{{ profile.website }}" target="_blank" style="color: #3498db; text-decoration: none;">{{ profile.website }}</a>
                         </div>
                     {% endif %}
-                    
+
                     {% if profile.telegram %}
-                        <div class="flex items-center text-gray-700">
-
-                            <a href="https://t.me/{{ profile.telegram|cut:'@' }}" target="_blank" class="text-blue-600 hover:underline">{{ profile.telegram }}</a>
+                        <div style="display: flex; align-items: center; gap: 10px; color: #666;">
+                            <span style="font-size: 18px;">📱</span>
+                            <a href="https://t.me/{{ profile.telegram|cut:'@' }}" target="_blank" style="color: #3498db; text-decoration: none;">{{ profile.telegram }}</a>
                         </div>
                     {% endif %}
-                    
+
                     {% if profile.discord %}
-                        <div class="flex items-center text-gray-700">
-
-                            {{ profile.discord }}
+                        <div style="display: flex; align-items: center; gap: 10px; color: #666;">
+                            <span style="font-size: 18px;">💬</span>
+                            <span>{{ profile.discord }}</span>
                         </div>
                     {% endif %}
-                    
+
                     {% if not profile.location and not profile.website and not profile.telegram and not profile.discord %}
-                        <p class="text-gray-500 italic">Контактная информация не указана</p>
+                        <p style="color: #999; font-style: italic;">Контактная информация не указана</p>
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Дата регистрации -->
-            <div class="bg-white rounded-lg shadow-md p-6 text-sm text-gray-500">
-                <p>Зарегистрирован: {{ profile_user.date_joined|date:"d.m.Y" }}</p>
-                <p>Последний визит: {{ profile_user.last_login|date:"d.m.Y H:i" }}</p>
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 8px; color: #666; font-size: 14px;">
+                    <div>📅 Зарегистрирован: {{ profile_user.date_joined|date:"d.m.Y" }}</div>
+                    <div>🕐 Последний визит: {{ profile_user.last_login|date:"d.m.Y H:i" }}</div>
+                </div>
             </div>
         </div>
-        
-        <!-- Правая колонка: Последние отзывы и избранное -->
-        <div class="md:col-span-2 space-y-6">
+
+        <!-- Правая колонка -->
+        <div>
             <!-- Последние отзывы -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Последние отзывы</h2>
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="font-size: 18px; font-weight: bold; color: #333;">Последние отзывы</h2>
                     {% if reviews_count > 5 %}
-                        <a href="{% url 'profile_reviews' profile_user.username %}" class="text-sm text-blue-600 hover:underline">
-                            Все отзывы ({{ reviews_count }})
+                        <a href="{% url 'profile_reviews' profile_user.username %}" style="color: #3498db; text-decoration: none; font-size: 14px;">
+                            Все отзывы ({{ reviews_count }}) →
                         </a>
                     {% endif %}
                 </div>
-                
+
                 {% if reviews %}
-                    <div class="space-y-4">
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
                         {% for review in reviews %}
-                            <div class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                                <div class="flex justify-between items-start">
-                                    <a href="{% url 'game_detail' review.game.id %}" class="font-medium text-gray-900 hover:text-blue-600">
-                                        {{ review.game.name }}
-                                    </a>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; {% if forloop.last %}border-bottom: none; padding-bottom: 0;{% endif %}">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+                                    {% if review.game and review.game.id %}
+                                        <a href="{% url 'game_detail' review.game.id %}" style="font-weight: 600; color: #333; text-decoration: none; hover: color: #3498db;">
+                                            {{ review.game.name }}
+                                        </a>
+                                    {% else %}
+                                        <span style="font-weight: 600; color: #999;">Игра удалена</span>
+                                    {% endif %}
+                                    <span style="background: #f1c40f; color: #333; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
                                         {{ review.score }}/10
                                     </span>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-1">{{ review.comment|truncatechars:100 }}</p>
-                                <p class="text-xs text-gray-400 mt-1">{{ review.created_at|date:"d.m.Y" }}</p>
+                                {% if review.comment %}
+                                    <p style="color: #666; font-size: 14px; margin: 5px 0;">{{ review.comment|truncatechars:100 }}</p>
+                                {% endif %}
+                                <p style="color: #999; font-size: 12px; margin: 5px 0 0;">{{ review.dt_created|date:"d.m.Y" }}</p>
                             </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="text-gray-500 italic">Пользователь еще не оставил отзывов</p>
+                    <p style="color: #999; font-style: italic; text-align: center; padding: 20px;">Пользователь еще не оставил отзывов</p>
                 {% endif %}
             </div>
-            
+
             <!-- Последние избранные игры -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Избранные игры</h2>
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="font-size: 18px; font-weight: bold; color: #333;">Избранные игры</h2>
                     {% if favourites_count > 5 %}
-                        <a href="{% url 'profile_favourites_full' profile_user.username %}" class="text-sm text-blue-600 hover:underline">
-                            Все избранные ({{ favourites_count }})
+                        <a href="{% url 'profile_favourites_full' profile_user.username %}" style="color: #3498db; text-decoration: none; font-size: 14px;">
+                            Все избранные ({{ favourites_count }}) →
                         </a>
                     {% endif %}
                 </div>
-                
-                {% if favourites %}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {% for fav in favourites %}
-                            <a href="{% url 'game_detail' fav.game.id %}" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                <div class="flex-1">
-                                    <p class="font-medium text-gray-900">{{ fav.game.name }}</p>
-                                    <p class="text-xs text-gray-500">{{ fav.game.genre }} • {{ fav.game.year|date:"Y" }}</p>
-                                </div>
 
-                            </a>
+                {% if favourites %}
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        {% for fav in favourites %}
+                            {% if fav.game and fav.game.id %}
+                                <a href="{% url 'game_detail' fav.game.id %}" style="display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; text-decoration: none; transition: background 0.3s; hover: background: #e9ecef;">
+                                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">{{ fav.game.name }}</div>
+                                    <div style="display: flex; gap: 10px; color: #666; font-size: 12px;">
+                                        <span>{{ fav.game.genre }}</span>
+                                        <span>•</span>
+                                        <span>{{ fav.game.year|date:"Y" }}</span>
+                                    </div>
+                                </a>
+                            {% else %}
+                                <div style="padding: 10px; background: #f8f9fa; border-radius: 8px; color: #999;">
+                                    Игра удалена
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="text-gray-500 italic">Нет игр в избранном</p>
+                    <p style="color: #999; font-style: italic; text-align: center; padding: 20px;">Нет игр в избранном</p>
                 {% endif %}
             </div>
-        <!-- В разделе с последними отзывами добавьте текст комментария --><div class="bg-white rounded-lg shadow-md p-6">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">Последние отзывы</h2>
-        {% if reviews_count > 5 %}
-            <a href="{% url 'profile_reviews' profile_user.username %}" class="text-sm text-blue-600 hover:underline">
-                Все отзывы ({{ reviews_count }})
-            </a>
-        {% endif %}
-    </div>
-
-    {% if reviews %}
-        <div class="space-y-4">
-            {% for review in reviews %}
-                <div class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                    <div class="flex justify-between items-start">
-                        {% if review.game and review.game.id %}
-                            <a href="{% url 'game_detail' review.game.id %}" class="font-medium text-gray-900 hover:text-blue-600">
-                                {{ review.game.name }}
-                            </a>
-                        {% else %}
-                            <span class="font-medium text-gray-500">Игра удалена</span>
-                        {% endif %}
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            {{ review.score }}/10
-                        </span>
-                    </div>
-                    {% if review.comment %}
-                        <p class="text-sm text-gray-600 mt-1">{{ review.comment|truncatechars:100 }}</p>
-                    {% endif %}
-                    <p class="text-xs text-gray-400 mt-1">{{ review.dt_created|date:"d.m.Y" }}</p>
-                </div>
-            {% endfor %}
         </div>
-    {% else %}
-        <p class="text-gray-500 italic">Пользователь еще не оставил отзывов</p>
-    {% endif %}
+    </div>
 </div>
 {% endblock %}

@@ -18,30 +18,105 @@ from django.contrib import messages
 from django.urls import reverse
 from .models import Game, Review
 from .forms import ReviewForm
+from django.db.models import Count, Avg, Q
+from .recommendations import GameRecommender, get_popular_games, get_trending_games
 
 def home(request):
-    # Получаем все игры, сортируем по названию
-    games_list = Game.objects.all().order_by('name')
+    """Главная страница с играми и рекомендациями"""
+    # Получаем параметры сортировки и фильтрации
+    sort_by = request.GET.get('sort', 'name')
+    genre = request.GET.get('genre', '')
+    developer = request.GET.get('developer', '')
+    search = request.GET.get('search', '')
 
-    # Пагинация: 10 игр на страницу
+    # Базовый запрос
+    games_list = Game.objects.all()
+
+    # Применяем фильтры
+    if genre:
+        games_list = games_list.filter(genre__icontains=genre)
+    if developer:
+        games_list = games_list.filter(developer__icontains=developer)
+    if search:
+        games_list = games_list.filter(
+            Q(name__icontains=search) |
+            Q(developer__icontains=search) |
+            Q(producer__icontains=search)
+        )
+
+    # Применяем сортировку
+    if sort_by == 'rating':
+        games_list = sorted(games_list, key=lambda x: x.get_average_rating(), reverse=True)
+    elif sort_by == 'favourites':
+        games_list = games_list.annotate(fav_count=Count('favourite_games')).order_by('-fav_count')
+    elif sort_by == 'reviews':
+        games_list = games_list.annotate(review_count=Count('reviews')).order_by('-review_count')
+    elif sort_by == 'year_desc':
+        games_list = games_list.order_by('-year')
+    elif sort_by == 'year_asc':
+        games_list = games_list.order_by('year')
+    else:  # по названию
+        games_list = games_list.order_by('name')
+
+    # Пагинация
     paginator = Paginator(games_list, 10)
     page_number = request.GET.get('page')
     games = paginator.get_page(page_number)
 
-    return render(request, 'home.html', {
+    # Получаем рекомендации для авторизованного пользователя
+    recommendations = []
+    if request.user.is_authenticated:
+        recommender = GameRecommender(request.user)
+        recommendations = recommender.get_recommendations(limit=5)
+
+    # Получаем популярные игры
+    popular_games = get_popular_games(limit=5)
+
+    # Получаем все доступные жанры и разработчиков для фильтров
+    all_genres = Game.objects.values_list('genre', flat=True).distinct().order_by('genre')
+    all_developers = Game.objects.values_list('developer', flat=True).distinct().order_by('developer')[:20]
+
+    context = {
         'games': games,
-        'title': 'Каталог игр'
-    })
+        'title': 'Каталог игр',
+        'recommendations': recommendations,
+        'popular_games': popular_games,
+        'all_genres': all_genres,
+        'all_developers': all_developers,
+        'current_sort': sort_by,
+        'current_genre': genre,
+        'current_developer': developer,
+        'current_search': search,
+    }
+    return render(request, 'home.html', context)
 
 
 def game_detail(request, game_id):
+    """Детальная страница игры с похожими играми"""
     game = get_object_or_404(Game, id=game_id)
-    reviews = game.reviews.all()
+    reviews = game.reviews.all().select_related('user').order_by('-dt_created')
 
-    return render(request, 'game_detail.html', {
+    # Получаем похожие игры
+    similar_games = []
+    if request.user.is_authenticated:
+        recommender = GameRecommender(request.user)
+        similar_games = recommender.get_similar_games(game, limit=4)
+    else:
+        # Для неавторизованных - просто игры того же жанра
+        similar_games = Game.objects.filter(genre=game.genre).exclude(id=game.id)[:4]
+
+    # Статистика по оценкам
+    rating_distribution = game.get_rating_distribution()
+
+    context = {
         'game': game,
-        'reviews': reviews
-    })
+        'reviews': reviews,
+        'similar_games': similar_games,
+        'rating_distribution': rating_distribution,
+        'avg_rating': game.get_average_rating(),
+        'favourites_count': game.get_favourites_count(),
+    }
+    return render(request, 'game_detail.html', context)
 
 
 @login_required
